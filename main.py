@@ -77,6 +77,13 @@ def run(args):
     with open(args.config, 'r') as f:
         config = yaml.load(f, Loader=yaml.FullLoader)
 
+    show_gui = True
+    if args.no_gui:
+        show_gui = False
+    elif os.name != "nt" and not os.environ.get("DISPLAY"):
+        logging.warning("DISPLAY is not set; disabling GUI.")
+        show_gui = False
+
     # create dataloader
     loader = create_dataloader(config["dataset"])
     # create detector
@@ -105,10 +112,11 @@ def run(args):
         img1 = keypoints_plot(img, vo)
         img2 = traj_plotter.update(t, gt_pose[:, 3])
 
-        cv2.imshow("keypoints", img1)
-        cv2.imshow("trajectory", img2)
-        if cv2.waitKey(10) == 27:
-            break
+        if show_gui:
+            cv2.imshow("keypoints", img1)
+            cv2.imshow("trajectory", img2)
+            if cv2.waitKey(10) == 27:
+                break
 
     cv2.imwrite(os.path.join(results_dir, fname + ".png"), img2)
 
@@ -119,6 +127,8 @@ if __name__ == "__main__":
                         help='config file')
     parser.add_argument('--logging', type=str, default='INFO',
                         help='logging level: NOTSET, DEBUG, INFO, WARNING, ERROR, CRITICAL')
+    parser.add_argument('--no-gui', action='store_true',
+                        help='disable OpenCV GUI (useful for headless environments)')
 
     args = parser.parse_args()
 

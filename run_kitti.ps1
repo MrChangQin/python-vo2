@@ -1,7 +1,8 @@
 param(
   [string]$Sequence = '00',
   [string]$Configs = '',
-  [string]$MaxFrames = 'null'
+  [string]$MaxFrames = 'null',
+  [switch]$NoGui
 )
 
 $ErrorActionPreference = 'Stop'
@@ -47,7 +48,11 @@ foreach ($cfg in $configList) {
 
   Write-Host "Running $cfg (sequence $Sequence)"
   $tmpPathForPython = $tmpPath -replace '\\', '/'
-  python main.py --config $tmpPathForPython
+  if ($NoGui.IsPresent) {
+    python main.py --config $tmpPathForPython --no-gui
+  } else {
+    python main.py --config $tmpPathForPython
+  }
 
   $baseName = [System.IO.Path]::GetFileNameWithoutExtension($cfg)
   $outDir = Join-Path 'output' ("kitti_sequence_{0}" -f $Sequence)
