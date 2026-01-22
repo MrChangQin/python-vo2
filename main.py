@@ -5,6 +5,7 @@ import cv2
 import argparse
 import yaml
 import logging
+from tqdm import tqdm
 
 from utils.tools import plot_keypoints
 
@@ -93,7 +94,7 @@ def run(args):
     log_fopen = open(os.path.join(results_dir, fname + ".txt"), mode='a')
 
     vo = VisualOdometry(detector, matcher, loader.cam)
-    for i, img in enumerate(loader):
+    for i, img in enumerate(tqdm(loader, total=len(loader), desc="Frames", unit="frame")):
         gt_pose = loader.get_cur_pose()
         R, t = vo.update(img, absscale.update(gt_pose))
 
