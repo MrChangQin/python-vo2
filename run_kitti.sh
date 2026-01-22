@@ -2,6 +2,7 @@
 set -euo pipefail
 
 sequence="00"
+max_frames="null"
 configs=()
 
 while [[ $# -gt 0 ]]; do
@@ -14,8 +15,12 @@ while [[ $# -gt 0 ]]; do
       IFS=',' read -r -a configs <<< "$2"
       shift 2
       ;;
+    -m|--max-frames)
+      max_frames="$2"
+      shift 2
+      ;;
     -h|--help)
-      echo "Usage: ./run_kitti.sh [-s|--sequence 00] [-c|--configs file1,file2]"
+      echo "Usage: ./run_kitti.sh [-s|--sequence 00] [-c|--configs file1,file2] [-m|--max-frames N|null]"
       exit 0
       ;;
     *)
@@ -45,7 +50,13 @@ for cfg in "${configs[@]}"; do
 
   tmp_name="$(basename "${cfg%.yaml}")_seq_${sequence}.yaml"
   tmp_path="/tmp/${tmp_name}"
-  sed -E "s/^([[:space:]]*sequence:[[:space:]]*).+$/\\1'${sequence}'/" "$cfg" > "$tmp_path"
+  if [[ -n "$max_frames" ]]; then
+    sed -E "s/^([[:space:]]*sequence:[[:space:]]*).+$/\\1'${sequence}'/" "$cfg" \
+      | sed -E "s/^([[:space:]]*max_frames:[[:space:]]*).+$/\\1${max_frames}/" \
+      > "$tmp_path"
+  else
+    sed -E "s/^([[:space:]]*sequence:[[:space:]]*).+$/\\1'${sequence}'/" "$cfg" > "$tmp_path"
+  fi
 
   echo "Running $cfg (sequence $sequence)"
   python main.py --config "$tmp_path"

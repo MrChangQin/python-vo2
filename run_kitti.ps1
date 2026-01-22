@@ -1,6 +1,7 @@
 param(
   [string]$Sequence = '00',
-  [string]$Configs = ''
+  [string]$Configs = '',
+  [string]$MaxFrames = 'null'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -39,6 +40,9 @@ foreach ($cfg in $configList) {
   $tmpPath = New-TempYamlPath -BaseName $tmpName
   $content = Get-Content -LiteralPath $cfg -Raw
   $updated = $content -replace '(?m)^(\s*sequence:\s*).+$', "`${1}'$Sequence'"
+  if (-not [string]::IsNullOrWhiteSpace($MaxFrames)) {
+    $updated = $updated -replace '(?m)^(\s*max_frames:\s*).+$', "`${1}$MaxFrames"
+  }
   Set-Content -LiteralPath $tmpPath -Value $updated -NoNewline
 
   Write-Host "Running $cfg (sequence $Sequence)"
