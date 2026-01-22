@@ -27,13 +27,13 @@ done
 
 if [[ ${#configs[@]} -eq 0 ]]; then
   configs=(
-    'config\kitti_orb_brutematch.yaml',
+    'config/kitti_orb_brutematch.yaml',
     # 'config\kitti_sift_flannmatch.yaml',
-    'config\kitti_superpoint_flannmatch.yaml',
-    'config\kitti_superpoint_supergluematch.yaml',
-    'config\kitti_xfeat_xfeatmatch.yaml',
-    'config\kitti_swiftfeat_swiftfeatmatch.yaml',
-    'config\kitti_xfeat_lightgluematch.yaml'
+    'config/kitti_superpoint_flannmatch.yaml',
+    'config/kitti_superpoint_supergluematch.yaml',
+    'config/kitti_xfeat_xfeatmatch.yaml',
+    'config/kitti_swiftfeat_swiftfeatmatch.yaml',
+    'config/kitti_xfeat_lightgluematch.yaml'
   )
 fi
 
