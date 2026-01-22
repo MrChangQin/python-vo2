@@ -1,0 +1,12 @@
+numpy
+torch
+torchvision
+matplotlib
+PyYAML
+tqdm
+opencv-python
+kornia
+poselib
+gdown
+timm
+imageio

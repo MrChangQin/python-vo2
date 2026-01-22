@@ -1,0 +1,22 @@
+dataset:
+  name: KITTILoader
+  # root_path: /mnt/dataset_hdd/KITTI/odometry
+  root_path: datasets/data_odometry_gray/dataset
+  # root_path: test_imgs
+  sequence: '00'
+  start: 0
+  max_frames: 1500
+
+detector:
+  name: XFeatDetector
+  top_k: 4096
+  detection_threshold: 0.05
+  weights: detectors/xfeat/weights/xfeat.pt
+  cuda: 1
+
+matcher:
+  name: XFeatMatcher
+  top_k: 4096
+  min_cossim: -1
+  weights: detectors/xfeat/weights/xfeat.pt
+  detection_threshold: 0.05

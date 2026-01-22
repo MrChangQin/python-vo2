@@ -1,0 +1,20 @@
+dataset:
+  name: KITTILoader
+  root_path: datasets/data_odometry_gray/dataset
+  sequence: '00'
+  start: 0
+  max_frames: 1500
+
+detector:
+  name: XFeatDetector
+  top_k: 4096
+  detection_threshold: 0.05
+  weights: third_party/xfeat/weights/xfeat.pt
+  cuda: 1
+
+matcher:
+  name: XFeatLightGlueMatcher
+  top_k: 4096
+  min_conf: 0.1
+  weights: third_party/xfeat/weights/xfeat.pt
+  detection_threshold: 0.05

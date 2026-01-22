@@ -1,0 +1,90 @@
+import logging
+import sys
+from pathlib import Path
+
+import numpy as np
+import torch
+
+
+def _resolve_swiftfeat_root():
+    repo_root = Path(__file__).resolve().parent.parent
+    candidates = [
+        repo_root / "third_party/swiftfeat",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return candidates[0]
+
+
+def _resolve_weights_path(weights_value, swiftfeat_root):
+    weights_path = Path(weights_value)
+    if weights_path.is_absolute():
+        return weights_path
+    repo_root = Path(__file__).resolve().parent.parent
+    repo_candidate = repo_root / weights_path
+    if repo_candidate.exists():
+        return repo_candidate
+    return swiftfeat_root / "weights/xfeat_default_169500_swiftfeatv5.pt"
+
+
+class SwiftFeatLightGlueMatcher(object):
+    default_config = {
+        "top_k": 4096,
+        "min_conf": 0.1,
+        "weights": "third_party/swiftfeat/weights/xfeat_default_169500_swiftfeatv5.pt",
+        "detection_threshold": 0.05
+    }
+
+    def __init__(self, config={}):
+        self.config = self.default_config
+        self.config = {**self.config, **config}
+        logging.info("SwiftFeat LightGlue matcher config: ")
+        logging.info(self.config)
+
+        swiftfeat_root = _resolve_swiftfeat_root()
+        if str(swiftfeat_root) not in sys.path:
+            sys.path.insert(0, str(swiftfeat_root))
+
+        from modules.xfeat import XFeat
+
+        logging.info("creating SwiftFeat LightGlue matcher...")
+        weights_path = _resolve_weights_path(self.config["weights"], swiftfeat_root)
+        self.xfeat = XFeat(weights=str(weights_path),
+                           top_k=self.config["top_k"],
+                           detection_threshold=self.config["detection_threshold"])
+
+    def __call__(self, kptdescs):
+        ref = kptdescs["ref"]
+        cur = kptdescs["cur"]
+
+        device = self.xfeat.dev
+        ref_kpts = torch.from_numpy(ref["keypoints"]).float().to(device)
+        cur_kpts = torch.from_numpy(cur["keypoints"]).float().to(device)
+        ref_desc = torch.from_numpy(ref["descriptors"]).float().to(device)
+        cur_desc = torch.from_numpy(cur["descriptors"]).float().to(device)
+
+        ref_size = torch.tensor([ref["image"].shape[1], ref["image"].shape[0]], device=device).float()
+        cur_size = torch.tensor([cur["image"].shape[1], cur["image"].shape[0]], device=device).float()
+
+        d0 = {
+            "keypoints": ref_kpts,
+            "descriptors": ref_desc,
+            "image_size": ref_size
+        }
+        d1 = {
+            "keypoints": cur_kpts,
+            "descriptors": cur_desc,
+            "image_size": cur_size
+        }
+
+        logging.debug("matching keypoints with SwiftFeat + LightGlue...")
+        mkpts0, mkpts1, _ = self.xfeat.match_lighterglue(d0, d1, min_conf=self.config["min_conf"])
+
+        match_score = np.ones((mkpts0.shape[0],), dtype=np.float32)
+        ret_dict = {
+            "ref_keypoints": mkpts0,
+            "cur_keypoints": mkpts1,
+            "match_score": match_score
+        }
+        return ret_dict
