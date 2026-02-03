@@ -90,9 +90,9 @@ class SuperGlueMatcher(object):
 
 
 if __name__ == "__main__":
-    from DataLoader.SequenceImageLoader import SequenceImageLoader
-    from DataLoader.KITTILoader import KITTILoader
-    from Detectors.SuperPointDetector import SuperPointDetector
+    from dataloader.SequenceImageLoader import SequenceImageLoader
+    from dataloader.KITTILoader import KITTILoader
+    from detectors.SuperPointDetector import SuperPointDetector
 
     loader = SequenceImageLoader()
     detector = SuperPointDetector({"cuda": 0})

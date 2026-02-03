@@ -1,0 +1,4 @@
+config,mean_abs_error,mean_relative_error
+kitti_superpoint_flannmatch_seq_02,42.106635,0.118921
+kitti_superpoint_supergluematch_seq_02,13.105643,0.073350
+kitti_xfeat_lightgluematch,68.196228,0.165513

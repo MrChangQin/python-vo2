@@ -7,14 +7,14 @@ dataset:
 
 detector:
   name: SwiftFeatDetector
-  top_k: 4096
+  top_k: 1024
   detection_threshold: 0.05
   weights: third_party/swiftfeat/weights/xfeat_default_169500_swiftfeatv5.pt
   cuda: 1
 
 matcher:
   name: SwiftFeatMatcher
-  top_k: 4096
+  top_k: 1024
   min_cossim: -1
   weights: third_party/swiftfeat/weights/xfeat_default_169500_swiftfeatv5.pt
   detection_threshold: 0.05

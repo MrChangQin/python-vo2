@@ -7,14 +7,14 @@ dataset:
 
 detector:
   name: XFeatDetector
-  top_k: 4096
+  top_k: 2048
   detection_threshold: 0.05
   weights: third_party/xfeat/weights/xfeat.pt
   cuda: 1
 
 matcher:
   name: XFeatLightGlueMatcher
-  top_k: 4096
+  top_k: 2048
   min_conf: 0.1
   weights: third_party/xfeat/weights/xfeat.pt
   detection_threshold: 0.05
